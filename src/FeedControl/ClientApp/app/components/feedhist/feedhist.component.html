@@ -11,9 +11,11 @@
     </thead>
     <tbody>
         <tr *ngFor="let log of feedLogs">
-            <td>{{ log.EntryTime }}</td>
+            <td>{{ log.entryTime | date:'dd/MMM/yyyy HH:mm:ss' }}</td>
           <td>
-            <div></div>
+            <div>
+              <img *ngFor="let pic of log.pics" [src]="'uploads/' + pic" width="100" />  
+            </div>
           </td>
         </tr>
     </tbody>

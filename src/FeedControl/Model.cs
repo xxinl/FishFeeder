@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,6 +19,9 @@ namespace FeedControl
     public DateTime EntryTime { get; set; }
     public FeedLogType Type { get; set; }
     public string Content { get; set; }
+
+    [NotMapped]
+    public List<string> Pics { get; set; }
   }
 
   public enum FeedLogType

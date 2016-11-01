@@ -9,13 +9,13 @@ export class FeedHistComponent {
     public feedLogs: FeedLog[];
 
     constructor(http: Http) {
-      http.get('/api/GetFeedLogs').subscribe(result => {
+      http.get('/api/getfeedlogs').subscribe(result => {
         this.feedLogs = result.json();
         });
     }
 }
 
 interface FeedLog {
-  EntryTime: Date;
-  PicPath: string[];
+  entryTime: Date;
+  pics: string[];
 }

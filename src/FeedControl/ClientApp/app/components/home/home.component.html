@@ -1,9 +1,16 @@
-<h1>Hello, world!</h1>
-<p>Welcome!</p>
-<ul>
-  <li>Feed Hour:</li>
-  <li>Feed Now Button</li>
-  <li>Last ping beat:</li>
-  <li>Last Feed:</li>
-  <li>Last Feed Proof:</li>
+
+<h1>Status</h1>
+
+<p *ngIf="!status"><em>Loading...</em></p>
+
+<ul style="margin-top: 20px;" *ngIf="status">
+  <li>Feed Hour: {{status.feedHour}} <button type='button' class="btn btn-warning btn-sm" (click)="feednow()">Feed Now</button></li>
+  <li>Last ping beat: {{status.lastPingTime | date:'dd/MMM/yyyy HH:mm:ss'}}</li>
+  <li>Last Feed: {{status.lastFeedTime | date:'dd/MMM/yyyy HH:mm:ss'}}</li>
+  <li>
+    <div>Last Feed Proof:</div>
+    <div>
+      <img *ngFor="let pic of status.pics" [src]="'uploads/' + pic" width="100" />
+    </div>
+  </li>
 </ul>
