@@ -5,7 +5,7 @@
 
 <ul style="margin-top: 20px;" *ngIf="status">
   <li>Feed Hour: {{status.feedHour}} <button type='button' class="btn btn-warning btn-sm" (click)="feednow()">Feed Now</button></li>
-  <li>Last ping beat: {{status.lastPingTime | date:'dd/MMM/yyyy HH:mm:ss'}}</li>
+  <li>Last ping beat: {{status.lastPingTime}}</li>
   <li>Last Feed: {{status.lastFeedTime | date:'dd/MMM/yyyy HH:mm:ss'}}</li>
   <li>
     <div>Last Feed Proof:</div>
@@ -14,3 +14,6 @@
     </div>
   </li>
 </ul>
+
+<button type='button' class="btn btn-warning btn-sm" (click)="clearerrorlogs()">Clear Error Logs</button>
+<button type='button' class="btn btn-warning btn-sm" (click)="clearfeedlogs()">Clear Feed Logs</button>

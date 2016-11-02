@@ -27,6 +27,6 @@ namespace FeedControl
   public enum FeedLogType
   {
     FeedDone = 0,
-    PingLog = 1
+    Error = 2
   }
 }

@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace FeedControl
 {
   public class Startup
   {
-    public Startup(IHostingEnvironment env)
+    public Startup(IHostingEnvironment env, IOptions<FeedConfig> config)
     {
       var builder = new ConfigurationBuilder()
         .SetBasePath(env.ContentRootPath)
@@ -21,6 +23,40 @@ namespace FeedControl
         .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
         .AddEnvironmentVariables();
       Configuration = builder.Build();
+
+      using (var db = new DataContext())
+      {
+        db.Database.Migrate();
+
+        if (!db.Settings.Any(s => s.Key == "FEED_HOUR"))
+        {
+          db.Settings.Add(new Setting()
+          {
+            Key = "FEED_HOUR",
+            Value = config.Value.FeedHour.ToString()
+          });
+        }
+
+        if (!db.Settings.Any(s => s.Key == "FEED_NOW"))
+        {
+          db.Settings.Add(new Setting()
+          {
+            Key = "FEED_NOW",
+            Value = "0"
+          });
+        }
+
+        if (!db.Settings.Any(s => s.Key == "LAST_PING"))
+        {
+          db.Settings.Add(new Setting()
+          {
+            Key = "LAST_PING",
+            Value = ""
+          });
+        }
+
+        db.SaveChanges();
+      }
     }
 
     public IConfigurationRoot Configuration { get; }

@@ -2,79 +2,123 @@
 import os
 import time
 import requests
+import sys
+import glob
 
-SNums = [0, 1, 2, 3]  # Numbers of the Servos we'll be using in ServoBlaster
-SName = ["Waist", "Left", "Right", "Claw"]  # Names of Servos
-AMins = [0, 0, 0, 0]  # Minimum angles for Servos 0-3
-AMaxs = [180, 180, 180, 180]  # Maximum angles for Servos 0-3
-ACurs = [90, 0, 0, 60]  # Current angles being set as the intial angles
+servo_name = ["Waist", "Left", "Right", "Claw"]  # Names of Servos
+servo_min_pos = [0, 0, 0, 0]  # Minimum angles for Servos 0-3
+servo_max_pos = [180, 180, 180, 180]  # Maximum angles for Servos 0-3
+servo_init_pos = [90, 0, 0, 60]
+servo_curr_pos = servo_init_pos  # Current angles being set as the initial angles
+servo_move_step = [5, 5, 5, 0]
 
+WIN_DEBUG = 1
+#base_url = 'http://xfeed.azurewebsites.net/api/'
+base_url = 'http://localhost:20079/api/'
 
-os.system(
-    'sudo /home/pi/PiBits/ServoBlaster/user/servod --idle-timeout=2000')  # This line is sent to command line to start the servo controller
-
-
-def GoDirectlyTo(Servo, Pos):
-    ACurs[Servo] = Pos
-    micro = (1000 + (ACurs[Servo] * 8.3333))
-    print(ACurs[Servo], micro)
-    os.system("echo %d=%dus > /dev/servoblaster" % (SNums[Servo], micro))
-
-
-def StepGoTo(Servo, Pos, Step):
-    if ACurs[Servo] > Pos:
-        Step = 0 - Step
-
-    while ACurs[Servo] < AMaxs[Servo] & ACurs[Servo] > AMins[Servo]:
-        GoDirectlyTo(Servo, ACurs[Servo] + Step)
-
-    GoDirectlyTo(Servo, Pos)
+feed_steps = [
+    servo_init_pos,
+    [120, 0, 0, 60],
+    [120, 0, 0, 90],
+    [120, 0, 0, 60],
+    [-1, -1, -1, -1],
+    [120, 0, 0, 90],
+    servo_init_pos]
 
 
-def Reset():
-    GoDirectlyTo(3, 60)
-    StepGoTo(0, 90, 5)
+def go_directly_to(servo_idx, pos):
+    micro = (1000 + (pos * 8.3333))
+    print(servo_name[servo_idx], 'moving to pos', pos, micro)
+    if WIN_DEBUG != 1:
+        os.system("echo %d=%dus > /dev/servoblaster" % (servo_idx, micro))
+    servo_init_pos[servo_idx] = pos
 
 
-def Feed():
-    StepGoTo(0, 120, 5)
-    GoDirectlyTo(3, 90)
-    GoDirectlyTo(3, 60)
-    time.sleep(1)
-    GoDirectlyTo(3, 90)
+def step_go_to(servo_idx, pos, step):
+    if servo_curr_pos[servo_idx] > pos:
+        step = 0 - step
 
-    Reset()
+    # TODO pos out of min max range, currently assume all pos inputs are valid within min max range
+    while servo_init_pos[servo_idx] < servo_max_pos[servo_idx] & servo_init_pos[servo_idx] > servo_min_pos[servo_idx]:
+        go_directly_to(servo_idx, servo_curr_pos[servo_idx] + step)
+
+    go_directly_to(servo_idx, pos)
 
 
-def TakePics():
-    for i in range(5):
-        os.system("raspistill -o %s_%s.jpg" % (time.strftime("%Y%m%d"), i))
-        if i < 3:
-            time.sleep(10)
+def arm_go_to_pos(pos):
+    for idx in range(4):
+        if servo_move_step[idx] == 0:
+            go_directly_to(idx, pos[idx])
         else:
-            time.sleep(60)
+            step_go_to(idx, pos[idx], servo_move_step[idx])
+
+
+def reset():
+    arm_go_to_pos(servo_init_pos)
+
+
+def feed():
+    for idx in range(len(feed_steps)):
+        if feed_steps[idx][0] == -1:
+            time.sleep(1)
+        else:
+            arm_go_to_pos(feed_steps[idx])
+
+
+def take_pics():
+    for idx in range(5):
+        if WIN_DEBUG != 1:
+            os.system("raspistill -o %s_%s.jpg" % (time.strftime("%Y%m%d_%H%M%S"), idx))
+            if idx < 3:
+                time.sleep(10)
+            else:
+                time.sleep(60)
+
+
+if WIN_DEBUG != 1:
+    # This line is sent to command line to start the servo controller
+    os.system('sudo /home/pi/PiBits/ServoBlaster/user/servod --idle-timeout=2000')
 
 
 while 1 == 1:
     try:
-        url = 'http://xfeed.azurewebsites.net/api/oktofeed'
+        url = base_url + 'oktofeed'
         response = requests.get(url)
-        if response == "true":
-            Feed()
-            url = 'http://xfeed.azurewebsites.net/api/feeddone'
-        requests.get(url)
+        feeding = response.content
+        if feeding == b'true':
+            print('feeding', time.strftime("%Y%m%d_%H%M%S"))
+            feed()
+            url = base_url + 'feeddone'
+            requests.get(url)
 
-        time.sleep(5)
-        TakePics()
+            time.sleep(5)
+            take_pics()
 
-        url = 'http://xfeed.azurewebsites.net/api/uploadimages'
-        for i in range(5):
-            path = "%s/%s_%s.jpg" % (time.strftime("%Y%m%d"), time.strftime("%Y%m%d"), i)
-            files = {'file': (FILE, open(path, 'rb'), 'image/jpg', {'Expires': '0'})}
-            r = requests.post(url, files=files)
+            url = base_url + 'uploadimages'
+            images = glob.glob('*.jpg')
+            if len(images) > 0:
+                print('uploading images', len(images))
+                files = [('image', (path, open(path, 'rb'), 'image/jpg', {'Expires': '0'})) for path in images]
+                r = requests.post(url, files=files)
+
+                [f[1][1].close() for f in files]
+
+                print('deleting images', len(images))
+                [os.remove(path) for path in images]
+
+            print('feed done', time.strftime("%Y%m%d_%H%M%S"))
 
     except Exception as e:
-        # TODO log
-        print('ERROR:', e)
+        msg = str(e)
+        print('ERROR:', msg)
 
-    time.sleep(5)
+        try:
+            url = base_url + 'logerror?msg=' + msg
+            requests.get(url)
+        except Exception as e:
+            print('ERROR:', str(e))
+
+    if WIN_DEBUG != 1:
+        time.sleep(15)
+    else:
+        time.sleep(5)

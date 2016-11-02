@@ -19,6 +19,16 @@ export class HomeComponent {
     this._http.get('/api/feednow').subscribe(result => {
       });
   }
+
+  public clearerrorlogs() {
+    this._http.get('/api/clearerrorlogs').subscribe(result => {
+    });
+  }
+
+  public clearfeedlogs() {
+    this._http.get('/api/clearfeedlogs').subscribe(result => {
+    });
+  }
 }
 
 interface FeedStatus {
