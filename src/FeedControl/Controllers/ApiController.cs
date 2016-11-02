@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,7 +20,7 @@ namespace FeedControl.Controllers
     private const string FEED_NOW_KEY = "FEED_NOW";
 
     private readonly IOptions<FeedConfig> _config;
-    private IHostingEnvironment _environment;
+    private readonly IHostingEnvironment _environment;
 
     public ApiController(IOptions<FeedConfig> config, IHostingEnvironment environment)
     {
@@ -28,6 +29,8 @@ namespace FeedControl.Controllers
 
       using (var db = new DataContext())
       {
+        db.Database.Migrate();
+
         if (!db.Settings.Any(s => s.Key == FEED_HOUR_KEY))
         {
           db.Settings.Add(new Setting()
