@@ -162,5 +162,11 @@ namespace FeedControl.Controllers
       var dir = Path.Combine(_environment.WebRootPath, "uploads", date.ToString("yyyyMMdd"));
       return Directory.GetFiles(dir).Select(f => $"{date.ToString("yyyyMMdd")}/{Path.GetFileName(f)}").ToList();
     }
+
+    [Route("ping"), HttpGet]
+    public string Ping()
+    {
+      return DateTime.Now.ToString();
+    }
   }
 }
