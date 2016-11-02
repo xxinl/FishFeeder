@@ -17,16 +17,11 @@
                         <span class='glyphicon glyphicon-home'></span> Home
                     </a>
                 </li>
-              <li [routerLinkActive]="['link-active']">
-                <a [routerLink]="['/feed-hist', false]">
-                  <span class='glyphicon glyphicon-th-list'></span> Feed History
-                </a>
-              </li>
-              <li [routerLinkActive]="['link-active']">
-                <a [routerLink]="['/feed-hist', true]">
-                  <span class='glyphicon glyphicon-th-list'></span> Logs
-                </a>
-              </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/feed-hist']">
+                        <span class='glyphicon glyphicon-th-list'></span> Feed History
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

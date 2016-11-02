@@ -19,7 +19,7 @@ import { FeedHistComponent } from './components/feedhist/feedhist.component';
     RouterModule.forRoot([
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
-      { path: 'feed-hist/:islog', component: FeedHistComponent },
+      { path: 'feed-hist', component: FeedHistComponent },
       { path: '**', redirectTo: 'home' }
     ])
   ]
