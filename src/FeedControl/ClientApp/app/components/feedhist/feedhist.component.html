@@ -1,20 +1,26 @@
-<h1>Feed History</h1>
+<h1 *ngIf="!isLogScreen">Feed History</h1>
+<h1 *ngIf="isLogScreen">Logs</h1>
 
 <p *ngIf="!feedLogs"><em>Loading...</em></p>
 
 <table class='table' *ngIf="feedLogs">
     <thead>
         <tr>
-            <th>Time</th>
-            <th></th>
+          <th>Time</th>
+          <th></th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let log of feedLogs">
-            <td>{{ log.entryTime | date:'dd/MMM/yyyy HH:mm:ss' }}</td>
-          <td>
+          <td>{{ log.entryTime | date:'dd/MMM/yyyy HH:mm:ss' }}</td>
+          <td *ngIf="!isLogScreen">
             <div>
               <img *ngFor="let pic of log.pics" [src]="'uploads/' + pic" width="100" />  
+            </div>
+          </td>
+          <td *ngIf="isLogScreen">
+            <div>
+              {{log.content}}
             </div>
           </td>
         </tr>
