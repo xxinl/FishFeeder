@@ -165,7 +165,14 @@ namespace FeedControl.Controllers
     private List<string> getImagePaths(DateTime date)
     {
       var dir = Path.Combine(_environment.WebRootPath, "uploads", date.ToString("yyyyMMdd"));
-      return Directory.GetFiles(dir).Select(f => $"{date.ToString("yyyyMMdd")}/{Path.GetFileName(f)}").ToList();
+      if (Directory.Exists(dir))
+      {
+        return Directory.GetFiles(dir).Select(f => $"{date.ToString("yyyyMMdd")}/{Path.GetFileName(f)}").ToList();
+      }
+      else
+      {
+        return null;
+      }
     }
 
     [Route("ping"), HttpGet]
