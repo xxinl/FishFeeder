@@ -62,7 +62,8 @@ namespace FeedControl.Controllers
         var feedHour = Convert.ToInt32(hourStr);
 
         var now = DateTime.Now;
-        var lastFeedTime = db.FeedLogs.OrderByDescending(l => l.EntryTime).FirstOrDefault(l => l.Type == FeedLogType.FeedDone);
+        var lastFeedTime =
+          db.FeedLogs.OrderByDescending(l => l.EntryTime).FirstOrDefault(l => l.Type == FeedLogType.FeedDone);
         var isFeedNow = db.Settings.First(s => s.Key == FEED_NOW_KEY).Value == "1";
 
         if (isFeedNow || lastFeedTime != null && lastFeedTime.EntryTime.Day < now.Day && feedHour == now.Hour)
@@ -104,11 +105,15 @@ namespace FeedControl.Controllers
       using (var db = new DataContext())
       {
         var hourStr = db.Settings.First(s => s.Key == FEED_HOUR_KEY).Value;
-        var lastFeedTime = db.FeedLogs.OrderByDescending(l => l.EntryTime).FirstOrDefault(l => l.Type == FeedLogType.FeedDone).EntryTime;
-        var lastPingTime = db.FeedLogs.OrderByDescending(l => l.EntryTime).FirstOrDefault(l => l.Type == FeedLogType.PingLog).EntryTime;
+        var lastFeedTime =
+          db.FeedLogs.OrderByDescending(l => l.EntryTime).FirstOrDefault(l => l.Type == FeedLogType.FeedDone).EntryTime;
+        var lastPingTime =
+          db.FeedLogs.OrderByDescending(l => l.EntryTime).FirstOrDefault(l => l.Type == FeedLogType.PingLog).EntryTime;
 
         return new JsonResult(
-          new {FeedHour = hourStr,
+          new
+          {
+            FeedHour = hourStr,
             LastFeedTime = lastFeedTime,
             LastPingTime = lastPingTime,
             Pics = getImagePaths(lastFeedTime)
@@ -131,7 +136,7 @@ namespace FeedControl.Controllers
     {
       using (var db = new DataContext())
       {
-        db.FeedLogs.Add(new FeedLog() { EntryTime = DateTime.Now, Type = FeedLogType.FeedDone });
+        db.FeedLogs.Add(new FeedLog() {EntryTime = DateTime.Now, Type = FeedLogType.FeedDone});
         db.SaveChanges();
       }
     }
@@ -167,6 +172,22 @@ namespace FeedControl.Controllers
     public string Ping()
     {
       return DateTime.Now.ToString();
+    }
+
+    [Route("dbping"), HttpGet]
+    public string DbPing()
+    {
+      try
+      {
+        using (var db = new DataContext())
+        {
+          return db.Settings.First(s => s.Key == FEED_HOUR_KEY).Value;
+        }
+      }
+      catch (Exception e)
+      {
+        return e.Message + e.InnerException.Message;
+      }
     }
   }
 }
