@@ -5,6 +5,7 @@ import requests
 import sys
 import glob
 
+
 servo_name = ["Waist", "Left", "Right", "Claw"]  # Names of Servos
 servo_min_pos = [0, 0, 0, 0]  # Minimum angles for Servos 0-3
 servo_max_pos = [180, 180, 180, 180]  # Maximum angles for Servos 0-3
@@ -12,7 +13,7 @@ servo_init_pos = [90, 0, 0, 60]
 servo_curr_pos = servo_init_pos  # Current angles being set as the initial angles
 servo_move_step = [5, 5, 5, 0]
 
-WIN_DEBUG = 1
+WIN_DEBUG = 0
 base_url = 'http://localhost:20079/api/'
 
 feed_steps = [

@@ -8,6 +8,7 @@ import { Http } from '@angular/http';
 export class HomeComponent {
   
   public status: FeedStatus;
+  public bigPic: string;
 
   constructor(private _http: Http) {
     this._http.get('/api/getstatus').subscribe(result => {

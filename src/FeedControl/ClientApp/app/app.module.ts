@@ -5,6 +5,7 @@ import { AppComponent } from './components/app/app.component'
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { HomeComponent } from './components/home/home.component';
 import { FeedHistComponent } from './components/feedhist/feedhist.component';
+import { ImageComponent } from './components/image/image.component';
 
 @NgModule({
   bootstrap: [AppComponent],
@@ -12,7 +13,8 @@ import { FeedHistComponent } from './components/feedhist/feedhist.component';
     AppComponent,
     NavMenuComponent,
     FeedHistComponent,
-    HomeComponent
+    HomeComponent,
+    ImageComponent
   ],
   imports: [
     UniversalModule, // Must be first import. This automatically imports BrowserModule, HttpModule, and JsonpModule too.
@@ -20,6 +22,7 @@ import { FeedHistComponent } from './components/feedhist/feedhist.component';
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
       { path: 'feed-hist/:islog', component: FeedHistComponent },
+      { path: 'image/:url', component: ImageComponent },
       { path: '**', redirectTo: 'home' }
     ])
   ]

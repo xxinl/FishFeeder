@@ -15,7 +15,9 @@
           <td>{{ log.entryTime | date:'dd/MMM/yyyy HH:mm:ss' }}</td>
           <td *ngIf="!isLogScreen">
             <div>
-              <img *ngFor="let pic of log.pics" [src]="'uploads/' + pic" width="100" />  
+              <a [routerLink]="['/image', pic]" *ngFor="let pic of log.pics">
+                <img class="img-rounded" [src]="'uploads/' + pic" width="80" />
+              </a>
             </div>
           </td>
           <td *ngIf="isLogScreen">

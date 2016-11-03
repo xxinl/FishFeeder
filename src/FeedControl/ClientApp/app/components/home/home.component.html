@@ -3,17 +3,20 @@
 
 <p *ngIf="!status"><em>Loading...</em></p>
 
-<ul style="margin-top: 20px;" *ngIf="status">
-  <li>Feed Hour: {{status.feedHour}} <button type='button' class="btn btn-warning btn-sm" (click)="feednow()">Feed Now</button></li>
+<ul style="margin-top: 10px;" *ngIf="status">
+  <li>Feed Hour: {{status.feedHour}}</li>
   <li>Last ping beat: {{status.lastPingTime}}</li>
   <li>Last Feed: {{status.lastFeedTime | date:'dd/MMM/yyyy HH:mm:ss'}}</li>
   <li>
     <div>Last Feed Proof:</div>
     <div>
-      <img *ngFor="let pic of status.pics" [src]="'uploads/' + pic" width="100" />
+      <a [routerLink]="['/image', pic]" *ngFor="let pic of status.pics">
+        <img class="img-rounded" [src]="'uploads/' + pic" width="100" />
+      </a>
     </div>
   </li>
 </ul>
 
-<button type='button' class="btn btn-warning btn-sm" (click)="clearerrorlogs()">Clear Error Logs</button>
+<button type='button' class="btn btn-warning btn-sm" (click)="feednow()">Feed Now</button>
+<button type='button' class="btn btn-warning btn-sm" style="margin-left: 20px" (click)="clearerrorlogs()">Clear Error Logs</button>
 <button type='button' class="btn btn-warning btn-sm" (click)="clearfeedlogs()">Clear Feed Logs</button>
