@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -90,7 +91,12 @@ namespace FeedControl
         app.UseExceptionHandler("/Home/Error");
       }
 
-      app.UseStaticFiles();
+      var provider = new FileExtensionContentTypeProvider();
+      provider.Mappings[".py"] = "application/x-msdownload";
+      app.UseStaticFiles(new StaticFileOptions()
+      {
+        ContentTypeProvider = provider
+      });
 
       app.UseMvc(routes =>
       {
