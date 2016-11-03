@@ -17,12 +17,12 @@ export class FeedHistComponent implements OnInit {
   ngOnInit() {
     this.route.params.forEach((params: Params) => {
       this.isLogScreen = params['islog'] === "true";
-    });
 
-    let url = this.isLogScreen ? '/api/geterrors' : '/api/getfeedlogs';
+      let url = this.isLogScreen ? '/api/geterrors' : '/api/getfeedlogs';
 
-    this.http.get(url).subscribe(result => {
-      this.feedLogs = result.json();
+      this.http.get(url).subscribe(result => {
+        this.feedLogs = result.json();
+      });
     });
   }
 }
