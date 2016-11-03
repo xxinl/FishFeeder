@@ -13,7 +13,6 @@ servo_curr_pos = servo_init_pos  # Current angles being set as the initial angle
 servo_move_step = [5, 5, 5, 0]
 
 WIN_DEBUG = 1
-#base_url = 'http://xfeed.azurewebsites.net/api/'
 base_url = 'http://localhost:20079/api/'
 
 feed_steps = [
@@ -68,7 +67,7 @@ def feed():
 def take_pics():
     for idx in range(5):
         if WIN_DEBUG != 1:
-            os.system("raspistill -o %s_%s.jpg" % (time.strftime("%Y%m%d_%H%M%S"), idx))
+            os.system("raspistill -o %s_%s.jpg -w 1024 -h 768" % (time.strftime("%Y%m%d_%H%M%S"), idx))
             if idx < 3:
                 time.sleep(10)
             else:
