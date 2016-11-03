@@ -1,22 +1,22 @@
-<h1 *ngIf="!isLogScreen">Feed History</h1>
-<h1 *ngIf="isLogScreen">Logs</h1>
+<h2 *ngIf="!isLogScreen">Feed History</h2>
+<h2 *ngIf="isLogScreen">Logs</h2>
 
 <p *ngIf="!feedLogs"><em>Loading...</em></p>
 
 <table class='table' *ngIf="feedLogs">
     <thead>
         <tr>
-          <th>Time</th>
+          <th></th>
           <th></th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let log of feedLogs">
-          <td>{{ log.entryTime | date:'dd/MMM/yyyy HH:mm:ss' }}</td>
-          <td *ngIf="!isLogScreen">
-            <div>
+          <td>
+            <div><strong>{{ log.entryTime | date:'dd/MMM/yyyy HH:mm:ss' }}</strong></div>
+            <div *ngIf="!isLogScreen">
               <a [routerLink]="['/image', pic]" *ngFor="let pic of log.pics">
-                <img class="img-rounded" [src]="'uploads/' + pic" width="80" />
+                <img class="img-rounded" [src]="'uploads/' + pic" width="75"/>
               </a>
             </div>
           </td>

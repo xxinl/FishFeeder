@@ -1,5 +1,9 @@
 
-<h1>Status</h1>
+<h2>Status</h2>
+
+<button type='button' class="btn btn-warning btn-sm" (click)="feednow()">Feed Now</button>
+<button type='button' class="btn btn-warning btn-sm" style="margin-left: 10px" (click)="clearerrorlogs()">Clear Error Logs</button>
+<button type='button' class="btn btn-warning btn-sm" (click)="clearfeedlogs()">Clear Feed Logs</button>
 
 <p *ngIf="!status"><em>Loading...</em></p>
 
@@ -9,7 +13,7 @@
   <li>Last Feed: {{status.lastFeedTime | date:'dd/MMM/yyyy HH:mm:ss'}}</li>
   <li>
     <div>Last Feed Proof:</div>
-    <div>
+    <div style="margin-left: -20px">
       <a [routerLink]="['/image', pic]" *ngFor="let pic of status.pics">
         <img class="img-rounded" [src]="'uploads/' + pic" width="100" />
       </a>
@@ -17,6 +21,4 @@
   </li>
 </ul>
 
-<button type='button' class="btn btn-warning btn-sm" (click)="feednow()">Feed Now</button>
-<button type='button' class="btn btn-warning btn-sm" style="margin-left: 20px" (click)="clearerrorlogs()">Clear Error Logs</button>
-<button type='button' class="btn btn-warning btn-sm" (click)="clearfeedlogs()">Clear Feed Logs</button>
+
