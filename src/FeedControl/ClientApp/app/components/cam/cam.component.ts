@@ -30,11 +30,13 @@ export class CamImageDirective implements OnInit {
     private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
-    this.http.get("/api/streamdown")
-      .subscribe(
+    setInterval(() => {
+      this.http.get("/api/streamdown")
+        .subscribe(
         data => {
           this.imageData = 'data:image/jpg;base64,' + data.json();
         }
-      );
+        );
+    }, 1000);
   }
 }

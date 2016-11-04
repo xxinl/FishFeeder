@@ -135,3 +135,6 @@ while 1 == 1:
             time.sleep(15)
         else:
             time.sleep(5)
+    else:
+        time.sleep(1)
+
