@@ -12,11 +12,16 @@
         <div class='clearfix'></div>
         <div class='navbar-collapse collapse'>
             <ul class='nav navbar-nav'>
-                <li [routerLinkActive]="['link-active']">
-                    <a [routerLink]="['/home']">
-                        <span class='glyphicon glyphicon-home'></span> Home
-                    </a>
-                </li>
+              <li [routerLinkActive]="['link-active']">
+                <a [routerLink]="['/home']">
+                  <span class='glyphicon glyphicon-home'></span> Home
+                </a>
+              </li>
+              <li [routerLinkActive]="['link-active']">
+                <a [routerLink]="['/cam']">
+                  <span class='glyphicon glyphicon-th-list'></span> Camera
+                </a>
+              </li>
               <li [routerLinkActive]="['link-active']">
                 <a [routerLink]="['/feed-hist', false]">
                   <span class='glyphicon glyphicon-th-list'></span> Feed History

@@ -13,7 +13,7 @@ servo_init_pos = [90, 0, 0, 60]
 servo_curr_pos = servo_init_pos  # Current angles being set as the initial angles
 servo_move_step = [5, 5, 5, 0]
 
-WIN_DEBUG = 0
+WIN_DEBUG = 1
 base_url = 'http://localhost:20079/api/'
 
 feed_steps = [
@@ -81,7 +81,20 @@ if WIN_DEBUG != 1:
 
 
 while 1 == 1:
+    is_cam_streaming = False
     try:
+        #camera streaming
+        url = base_url + 'startstream'
+        response = requests.get(url)
+        is_cam_streaming = response.content == b'true'
+        if is_cam_streaming:
+            if WIN_DEBUG != 1:
+                os.system("raspistill -o stream.jpg -w 800 -h 600")
+            url = base_url + 'streamup'
+            files = [('image', ('stream.jpg', open('stream.jpg', 'rb'), 'image/jpg', {'Expires': '0'}))]
+            r = requests.post(url, files=files)
+
+        #feeding
         url = base_url + 'oktofeed'
         response = requests.get(url)
         feeding = response.content
@@ -91,7 +104,6 @@ while 1 == 1:
             url = base_url + 'feeddone'
             requests.get(url)
 
-            time.sleep(5)
             take_pics()
 
             url = base_url + 'uploadimages'
@@ -118,7 +130,8 @@ while 1 == 1:
         except Exception as e:
             print('ERROR:', str(e))
 
-    if WIN_DEBUG != 1:
-        time.sleep(15)
-    else:
-        time.sleep(5)
+    if not is_cam_streaming:
+        if WIN_DEBUG != 1:
+            time.sleep(15)
+        else:
+            time.sleep(5)

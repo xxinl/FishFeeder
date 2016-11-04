@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -18,13 +20,21 @@ namespace FeedControl.Controllers
     private const string FEED_NOW_KEY = "FEED_NOW";
     private const string LAST_PING = "LAST_PING";
 
-    private readonly IOptions<FeedConfig> _config;
-    private readonly IHostingEnvironment _environment;
+    private const string CAM_IMAGE_CACHE_KEY = "CAM_IMAGE_CACHE_KEY";
+    private const string CAM_LAST_UPDATE_CACHE_KEY = "CAM_LAST_UPDATE_CACHE_KEY";
+    private const string CAM_LAST_REQUEST_CACHE_KEY = "CAM_LAST_REQUEST_CACHE_KEY";
 
-    public ApiController(IOptions<FeedConfig> config, IHostingEnvironment environment)
+    //private readonly IOptions<FeedConfig> _config;
+    private readonly IHostingEnvironment _environment;
+    private readonly IMemoryCache _memoryCache;
+
+    public ApiController(IOptions<FeedConfig> config, 
+      IHostingEnvironment environment, 
+      IMemoryCache memoryCache)
     {
-      this._config = config;
+      //this._config = config;
       this._environment = environment;
+      this._memoryCache = memoryCache;
     }
 
     [Route("oktofeed"), HttpGet]
@@ -215,6 +225,43 @@ namespace FeedControl.Controllers
       {
         return e.Message + e.InnerException.Message;
       }
+    }
+
+    [Route("streamup"), HttpPost]
+    public async Task StreamUp()
+    {
+      var files = Request.Form.Files;
+      if (files.Any())
+      {
+        var file = files.ElementAt(0);
+        _memoryCache.Set(CAM_LAST_UPDATE_CACHE_KEY, DateTime.Now);
+
+        using (var memoryStream = new MemoryStream())
+        {
+          await file.CopyToAsync(memoryStream);
+          _memoryCache.Set(CAM_IMAGE_CACHE_KEY, memoryStream.ToArray());
+        }
+      }
+    }
+
+    [Route("streamdown"), HttpGet]
+    public byte[] StreamDown()
+    {
+      _memoryCache.Set(CAM_LAST_REQUEST_CACHE_KEY, DateTime.Now);
+
+      return (byte[])_memoryCache.Get(CAM_IMAGE_CACHE_KEY);
+    }
+
+    [Route("startstream"), HttpGet]
+    public bool CheckIfStreamingUp()
+    {
+      DateTime lastRequest;
+      if (_memoryCache.Get(CAM_LAST_REQUEST_CACHE_KEY) == null)
+        lastRequest = DateTime.MinValue;
+      else
+        lastRequest = (DateTime) _memoryCache.Get(CAM_LAST_REQUEST_CACHE_KEY);
+
+      return DateTime.Now.Subtract(lastRequest).Seconds < 30;
     }
   }
 }
