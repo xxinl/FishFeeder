@@ -7,31 +7,33 @@ import glob
 
 
 servo_name = ["Waist", "Left", "Right", "Claw"]  # Names of Servos
-servo_min_pos = [0, 0, 0, 0]  # Minimum angles for Servos 0-3
-servo_max_pos = [180, 180, 180, 180]  # Maximum angles for Servos 0-3
-servo_init_pos = [90, 0, 0, 60]
-servo_curr_pos = servo_init_pos  # Current angles being set as the initial angles
-servo_move_step = [5, 5, 5, 0]
+servo_min_pos = [30, 40, 100, 110]  # Minimum angles for Servos 0-3
+servo_max_pos = [90, 60, 150, 160]  # Maximum angles for Servos 0-3
+servo_init_pos = [90, 54, 108, 153]
+servo_curr_pos = [90, 54, 108, 153]  # Current angles being set as the initial angles
+servo_move_step = [5, 5, 5, 10]
 
 WIN_DEBUG = 1
 base_url = 'http://localhost:20079/api/'
 
 feed_steps = [
     servo_init_pos,
-    [120, 0, 0, 60],
-    [120, 0, 0, 90],
-    [120, 0, 0, 60],
+    [36, 45, 144, 153],
+    [36, 45, 144, 116],
+    [36, 45, 144, 153],
     [-1, -1, -1, -1],
-    [120, 0, 0, 90],
+    [36, 45, 144, 116],
+    [36, 45, 144, 153],
     servo_init_pos]
 
 
 def go_directly_to(servo_idx, pos):
-    micro = (1000 + (pos * 8.3333))
+    micro = pos * 100 / 180
     print(servo_name[servo_idx], 'moving to pos', pos, micro)
     if WIN_DEBUG != 1:
-        os.system("echo %d=%dus > /dev/servoblaster" % (servo_idx, micro))
-    servo_init_pos[servo_idx] = pos
+        os.system("echo %d=%d%% > /dev/servoblaster" % (servo_idx, micro))
+        time.sleep(0.05)
+    servo_curr_pos[servo_idx] = pos
 
 
 def step_go_to(servo_idx, pos, step):
@@ -39,18 +41,22 @@ def step_go_to(servo_idx, pos, step):
         step = 0 - step
 
     # TODO pos out of min max range, currently assume all pos inputs are valid within min max range
-    while servo_init_pos[servo_idx] < servo_max_pos[servo_idx] & servo_init_pos[servo_idx] > servo_min_pos[servo_idx]:
+    while servo_curr_pos[servo_idx] < servo_max_pos[servo_idx] and servo_curr_pos[servo_idx] > servo_min_pos[servo_idx]:
         go_directly_to(servo_idx, servo_curr_pos[servo_idx] + step)
 
     go_directly_to(servo_idx, pos)
 
 
 def arm_go_to_pos(pos):
+    print('arm go to pos', pos)
     for idx in range(4):
-        if servo_move_step[idx] == 0:
-            go_directly_to(idx, pos[idx])
-        else:
-            step_go_to(idx, pos[idx], servo_move_step[idx])
+        if pos[idx] != servo_curr_pos[idx]:
+            if servo_move_step[idx] == 0:
+                print('direct to', pos[idx])
+                go_directly_to(idx, pos[idx])
+            else:
+                print('step to', pos[idx])
+                step_go_to(idx, pos[idx], servo_move_step[idx])
 
 
 def reset():
@@ -68,7 +74,7 @@ def feed():
 def take_pics():
     for idx in range(5):
         if WIN_DEBUG != 1:
-            os.system("raspistill -o %s_%s.jpg -w 1024 -h 768" % (time.strftime("%Y%m%d_%H%M%S"), idx))
+            os.system("raspistill -o %s_%s.jpg -w 800 -h 600" % (time.strftime("%Y%m%d_%H%M%S"), idx))
             if idx < 3:
                 time.sleep(10)
             else:
@@ -137,4 +143,4 @@ while 1 == 1:
             time.sleep(5)
     else:
         time.sleep(1)
-
+        
